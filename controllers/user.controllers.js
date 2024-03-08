@@ -100,8 +100,9 @@ exports.forgotPassword = async(req, res) => {
                 expiresIn: newDate
             }
         });
+        let html = `<p>To reset your password, click on the link below.<br>The link is valid for 30mins<br><a href='http://localhost:3000/reset-password?resettoken=${pwd_token}'>Reset password</a></p>`;
 
-        sendMail("Password Reset", `<a href='http://localhost:3000/reset-password?resettoken=${pwd_token}'>Reset password</a>`, email);
+        sendMail("Password Reset", html, email);
     } catch (e) {
         console.log(e);
 
