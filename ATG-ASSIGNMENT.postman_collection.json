@@ -19,7 +19,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"\",\r\n    \"username\": \"usai\",\r\n    \"password\": \"pwd_1\"\r\n}",
+					"raw": "{\r\n    \"email\": \"\",\r\n    \"username\": \"\",\r\n    \"password\": \"\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -43,7 +43,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"identificationID\": \"\",\r\n  \"password\": \"pwd_1\"\r\n}",
+					"raw": "{\r\n  \"identificationID\": \"\",\r\n  \"password\": \"\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
