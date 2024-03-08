@@ -113,7 +113,7 @@ exports.forgotPassword = async(req, res) => {
 exports.resetPassword = async (req, res) => {
     const {new_pwd, email} = req.body;
     const {token} = req.headers;
-
+    
     console.log(token);
 
     const exists = await ResetTokens.findOne({"token_data.token": token});
