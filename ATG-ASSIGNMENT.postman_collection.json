@@ -26,7 +26,7 @@
 						}
 					}
 				},
-				"url": "http://localhost:3001/api/register"
+				"url": "https://atg-f6bdi9nc2-usai729s-projects.vercel.app/api/register"
 			},
 			"response": []
 		},
@@ -50,7 +50,7 @@
 						}
 					}
 				},
-				"url": "http://localhost:3001/api/login"
+				"url": "https://atg-f6bdi9nc2-usai729s-projects.vercel.app/api/login"
 			},
 			"response": []
 		},
@@ -74,7 +74,7 @@
 						}
 					}
 				},
-				"url": "http://localhost:3001/api/forgot-password"
+				"url": "https://atg-f6bdi9nc2-usai729s-projects.vercel.app/api/forgot-password"
 			},
 			"response": []
 		},
@@ -98,7 +98,7 @@
 						}
 					}
 				},
-				"url": "http://localhost:3001/api/reset-password"
+				"url": "https://atg-f6bdi9nc2-usai729s-projects.vercel.app/api/reset-password"
 			},
 			"response": []
 		}
