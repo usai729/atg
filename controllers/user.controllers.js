@@ -90,19 +90,22 @@ exports.forgotPassword = async(req, res) => {
 
     try {
         const currentDate = new Date();
-        const newDate = new Date(currentDate.getTime() + 30 * 60000);
+        const newDate = new Date(currentDate.getTime() + 15 * 60000);
         
-        var pwd_token = crypto.randomBytes(32).toString("hex");
+        var pwd_token = crypto.randomBytes(64).toString("hex");
+        
+        let data = {
+            token:  pwd_token,
+            expiresIn: newDate
+        };
 
         await ResetTokens.create({
-            token_data: {
-                token:  pwd_token,
-                expiresIn: newDate
-            }
+            token_data: data
         });
-        let html = `<p>To reset your password, click on the link below.<br>The link is valid for 30mins<br><a href='http://localhost:3000/reset-password?resettoken=${pwd_token}'>Reset password</a></p>`;
+        let html = `<p>To reset your password, click on the link below.<br>The link is valid for <b>15 Minutes</b><br><a href='http://localhost:3000/reset-password?resettoken=${pwd_token}'>Reset password</a></p>`;
 
-        sendMail("Password Reset", html, email);
+        await sendMail("Password Reset", html, email);
+        return res.json({msg: "success/rest-link-sent", reset_token: data})
     } catch (e) {
         console.log(e);
 
