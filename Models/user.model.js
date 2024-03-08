@@ -13,6 +13,23 @@ const UserSchema = new mongoose.Schema({
 })
 const usermodel = mongoose.model("User", UserSchema);
 
+const ResetTokensSchema = new mongoose.Schema({
+    token_data: {
+        token: {
+            type: String,
+        },
+        expiresIn: {
+            type: Date,
+        }
+    },
+    added: {
+        type: Date,
+        default: Date.now
+    }
+})
+const resettokenmodel = mongoose.model("ResetTokens", ResetTokensSchema);
+
 module.exports = {
-    User: usermodel
+    User: usermodel,
+    ResetTokens: resettokenmodel
 }
