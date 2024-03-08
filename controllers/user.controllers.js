@@ -93,7 +93,7 @@ exports.forgotPassword = async(req, res) => {
         const newDate = new Date(currentDate.getTime() + 15 * 60000);
         
         var pwd_token = crypto.randomBytes(64).toString("hex");
-        
+
         let data = {
             token:  pwd_token,
             expiresIn: newDate
@@ -116,8 +116,6 @@ exports.forgotPassword = async(req, res) => {
 exports.resetPassword = async (req, res) => {
     const {new_pwd, email} = req.body;
     const {token} = req.headers;
-    
-    console.log(token);
 
     const exists = await ResetTokens.findOne({"token_data.token": token});
 
