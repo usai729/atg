@@ -17,7 +17,7 @@ Router.route("/").get((req, res) => {
   res.send("Posts route");
 });
 
-Router.route("/create/post").post(JWTverification, upload("post_image"));
+Router.route("/create/post").post(JWTverification);
 Router.route("/edit/post/:id").put(JWTverification);
 Router.route("/like/post").put(JWTverification);
 Router.route("/posts").get(JWTverification);
