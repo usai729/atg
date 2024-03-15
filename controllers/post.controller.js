@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const { Post, Comment, Reply } = require("../Models/posts.model");
 
 exports.create = async (req, res) => {
@@ -111,21 +112,50 @@ exports.getPost = async (req, res) => {
 	const { id } = req.params;
 
 	try {
-		const posts = await Post.findById(id)
-			.populate("by")
-			.populate("likes.likeBy");
-		const comments = await Comment.find({ to: posts?.id }).populate("by");
-
-		for (const comment of comments) {
-			comment.replies = await Reply.find({ to: comment?._id }).populate([
-				{ path: "by", select: "username" },
-				{ path: "likes.likeBy", select: "username" },
-			]);
-		}
+		const posts = await Post.aggregate([
+			{ $match: { _id: new mongoose.Types.ObjectId(id) } },
+			{
+				$lookup: {
+					from: "comments",
+					localField: "_id",
+					foreignField: "to",
+					as: "comments",
+				},
+			},
+			{ $unwind: "$comments" },
+			{
+				$lookup: {
+					from: "replies",
+					localField: "comments._id",
+					foreignField: "to",
+					as: "comments.replies",
+				},
+			},
+			{
+				$group: {
+					_id: "$_id",
+					post: { $first: "$post" },
+					likes: { $first: "$likes" },
+					by: { $first: "$by" },
+					edited: { $first: "$edited" },
+					dateAdded: { $first: "$dateAdded" },
+					comments: { $push: "$comments" },
+				},
+			},
+			{
+				$lookup: {
+					from: "users",
+					localField: "by",
+					foreignField: "_id",
+					as: "by",
+				},
+			},
+			{ $unwind: "$by" },
+		]);
 
 		return res.status(200).json({
 			msg: "success/fetched-post",
-			data: posts ? { posts: posts, comments } : "err/no-posts-found",
+			data: posts ? { posts: posts } : "err/no-posts-found",
 		});
 	} catch (e) {
 		console.log(e);
