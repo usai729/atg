@@ -119,7 +119,7 @@
 				"header": [
 					{
 						"key": "token",
-						"value": "260881c7497ed7f5a0c35b09130f31842d7d9e048a16da1aa37b20af642e42b080bd1962cecfaaf56af9a003a16f86190abf6b7c7b206ce0192fa26234b7a5",
+						"value": "",
 						"type": "text"
 					}
 				],
@@ -344,7 +344,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3001/api/p/like/post?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjJlNzkyMzgzYzY4YzhmYjU4MmZlNyIsImlhdCI6MTcxMDQxNzg2MCwiZXhwIjoxNzEwNDIxNDYwfQ.1aYZwStT2gseohNi3nluoLuOC-34UM5VmzdtXcfuMG0",
+					"raw": "http://localhost:3001/api/p/like/post",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -359,8 +359,7 @@
 					"query": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjJlNzkyMzgzYzY4YzhmYjU4MmZlNyIsImlhdCI6MTcxMDQxNzg2MCwiZXhwIjoxNzEwNDIxNDYwfQ.1aYZwStT2gseohNi3nluoLuOC-34UM5VmzdtXcfuMG0"
-						}
+							"value": ""
 					]
 				}
 			},
