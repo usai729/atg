@@ -124,14 +124,6 @@ exports.getPost = async (req, res) => {
 			},
 			{ $unwind: "$comments" },
 			{
-				$lookup: {
-					from: "replies",
-					localField: "comments._id",
-					foreignField: "to",
-					as: "comments.replies",
-				},
-			},
-			{
 				$group: {
 					_id: "$_id",
 					post: { $first: "$post" },
