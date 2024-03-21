@@ -21,6 +21,7 @@ function crypt(data, type, receivedIV, receivedKey) {
 				const cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
 				const encryptedData =
 					cipher.update(data, "utf-8", "hex") + cipher.final("hex");
+
 				return {
 					iv: iv.toString("hex"),
 					key: key.toString("base64"),
@@ -28,6 +29,7 @@ function crypt(data, type, receivedIV, receivedKey) {
 				};
 			} catch (e) {
 				console.log(e);
+
 				return false;
 			}
 		case "dec":
@@ -37,12 +39,14 @@ function crypt(data, type, receivedIV, receivedKey) {
 					key,
 					iv,
 				);
+
 				return (
 					decipher.update(data, "hex", "utf-8") +
 					decipher.final("utf-8")
 				);
 			} catch (e) {
 				console.log(e);
+
 				return false;
 			}
 		default:
