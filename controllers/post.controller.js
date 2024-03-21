@@ -231,6 +231,7 @@ exports.getPost = async (req, res) => {
 			...posts[0],
 			post: decryptedPost,
 			comments: decryptedComments,
+			token: genToken(posts[0]._id),
 		};
 
 		return res.status(200).json({
