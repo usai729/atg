@@ -1,10 +1,6 @@
-Sure, here's a more concise version:
-
----
-
 # ATG Social Media API
 
-Welcome to the ATG Social Media API! Below are the available endpoints and their descriptions:
+Below are the available endpoints and their descriptions:
 
 ## User Endpoints
 
@@ -43,5 +39,3 @@ Welcome to the ATG Social Media API! Below are the available endpoints and their
     -   Like/unlike a comment.
 
 ---
-
-Feel free to adjust the descriptions or add more details as needed!
