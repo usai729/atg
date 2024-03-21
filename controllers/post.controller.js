@@ -1,16 +1,39 @@
 const { default: mongoose } = require("mongoose");
-const { Post, Comment, Reply } = require("../Models/posts.model");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+
+const { Post, Comment } = require("../Models/posts.model");
+const crypt = require("../utils/crypt");
+
+function genToken(id) {
+	const token = jwt.sign(
+		{
+			id: id,
+		},
+		process.env.JWT_SECRET,
+	);
+
+	return token;
+}
 
 exports.create = async (req, res) => {
 	const { post } = req.body;
 
+	const encyrpted = crypt(post, "enc");
+
 	try {
 		Post.create({
-			post: post,
+			post: encyrpted.encryptedData,
 			by: req.user.id,
+			"crypt.iv": encyrpted.iv,
+			"crypt.key": encyrpted.key,
 		})
-			.then(() => {
-				return res.status(200).json({ msg: "success/post-created" });
+			.then((post) => {
+				return res.status(200).json({
+					msg: "success/post-created",
+					token: genToken(post.id),
+					encryptedPost: post.post,
+				});
 			})
 			.catch((e) => {
 				throw e;
@@ -26,12 +49,23 @@ exports.editPost = async (req, res) => {
 	const { newContent } = req.body;
 	const { id } = req.params;
 
+	const encyrpted = crypt(newContent, "enc");
+
 	try {
-		await Post.findByIdAndUpdate(id, {
-			$set: { post: newContent, edited: true },
+		const post = await Post.findByIdAndUpdate(id, {
+			$set: {
+				post: encyrpted.encryptedData,
+				edited: true,
+				"crypt.iv": encyrpted.iv,
+				"crypt.key": encyrpted.key,
+			},
 		});
 
-		return res.status(200).json({ msg: "success/post-edited" });
+		return res.status(200).json({
+			msg: "success/post-edited",
+			token: genToken(post.id),
+			encryptedPost: post.post,
+		});
 	} catch (e) {
 		console.log(e);
 
@@ -67,7 +101,7 @@ exports.like = async (req, res) => {
 			message = "success/post-liked";
 		}
 
-		return res.status(200).json({ msg: message });
+		return res.status(200).json({ msg: message, token: genToken(post.id) });
 	} catch (e) {
 		console.log(e);
 
@@ -79,6 +113,7 @@ exports.deletePost = async (req, res) => {
 	const { id } = req.params;
 
 	const post = await Post.findOne({ _id: id });
+	const postId = post.id;
 
 	if (!post) {
 		return res.status(404).json({ msg: "err/post-not-found" });
@@ -88,7 +123,9 @@ exports.deletePost = async (req, res) => {
 		await post.deleteOne();
 		await Comment.findOneAndDelete({ to: id });
 
-		return res.status(200).json({ msg: "success/post-deleted" });
+		return res
+			.status(200)
+			.json({ msg: "success/post-deleted", token: genToken(postId) });
 	} catch (e) {
 		console.log(e);
 
@@ -100,7 +137,27 @@ exports.getPosts = async (req, res) => {
 	try {
 		const posts = await Post.find().populate("by").populate("likes.likeBy");
 
-		return res.status(200).json({ msg: "success/fetched-posts", posts });
+		const decryptedPosts = posts.map((post) => {
+			return {
+				posts: [
+					{
+						posts: crypt(
+							post.post,
+							"dec",
+							post.crypt.iv,
+							post.crypt.key,
+						),
+					},
+					{ by: post.by },
+					{ likes: post.likes },
+				],
+				token: genToken(post.id),
+			};
+		});
+
+		return res
+			.status(200)
+			.json({ msg: "success/fetched-posts", decryptedPosts });
 	} catch (e) {
 		console.log(e);
 
@@ -122,18 +179,6 @@ exports.getPost = async (req, res) => {
 					as: "comments",
 				},
 			},
-			{ $unwind: "$comments" },
-			{
-				$group: {
-					_id: "$_id",
-					post: { $first: "$post" },
-					likes: { $first: "$likes" },
-					by: { $first: "$by" },
-					edited: { $first: "$edited" },
-					dateAdded: { $first: "$dateAdded" },
-					comments: { $push: "$comments" },
-				},
-			},
 			{
 				$lookup: {
 					from: "users",
@@ -143,11 +188,54 @@ exports.getPost = async (req, res) => {
 				},
 			},
 			{ $unwind: "$by" },
+			{
+				$group: {
+					_id: "$_id",
+					post: { $first: "$post" },
+					likes: { $first: "$likes" },
+					iv: { $first: "$crypt.iv" },
+					key: { $first: "$crypt.key" },
+					by: { $first: "$by" },
+					edited: { $first: "$edited" },
+					dateAdded: { $first: "$dateAdded" },
+					comments: { $push: "$comments" },
+				},
+			},
 		]);
+
+		const decryptedPost = crypt(
+			posts[0].post,
+			"dec",
+			posts[0].iv,
+			posts[0].key,
+		);
+
+		var decryptedComments;
+		if (posts[0].comments[0][0]) {
+			decryptedComments = posts[0].comments[0].map((comment) => {
+				return {
+					...comment,
+					comment: crypt(
+						comment.comment,
+						"dec",
+						comment.crypt.iv,
+						comment.crypt.key,
+					),
+				};
+			});
+		} else {
+			decryptedComments = {};
+		}
+
+		const responseData = {
+			...posts[0],
+			post: decryptedPost,
+			comments: decryptedComments,
+		};
 
 		return res.status(200).json({
 			msg: "success/fetched-post",
-			data: posts ? { posts: posts } : "err/no-posts-found",
+			data: responseData,
 		});
 	} catch (e) {
 		console.log(e);
@@ -165,14 +253,21 @@ exports.addComment = async (req, res) => {
 		return res.status(404).json({ msg: "err/post-not-found" });
 	}
 
+	const encrypted = crypt(comment, "enc");
+
 	try {
-		await Comment.create({
+		const comment = await Comment.create({
 			to: id,
-			comment: comment,
+			comment: encrypted.encryptedData,
 			by: req.user.id,
+			"crypt.iv": encrypted.iv,
+			"crypt.key": encrypted.key,
 		});
 
-		return res.status(200).json({ msg: "success/comment-added" });
+		return res.status(200).json({
+			msg: "success/comment-added",
+			token: genToken(comment.id),
+		});
 	} catch (e) {
 		console.log(e);
 

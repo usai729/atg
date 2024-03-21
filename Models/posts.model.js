@@ -23,6 +23,14 @@ const postSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User",
 	},
+	crypt: {
+		iv: {
+			type: String,
+		},
+		key: {
+			type: String,
+		},
+	},
 	edited: {
 		type: Boolean,
 		default: false,
@@ -52,6 +60,14 @@ const commentSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User",
 	},
+	crypt: {
+		iv: {
+			type: String,
+		},
+		key: {
+			type: String,
+		},
+	},
 	to: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Post",
@@ -72,6 +88,18 @@ const replySchema = new mongoose.Schema({
 	by: {
 		type: mongoose.Types.ObjectId,
 		ref: "User",
+	},
+	crypt: {
+		iv: {
+			type: String,
+		},
+		key: {
+			type: String,
+		},
+	},
+	to: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Comment",
 	},
 });
 const replyModel = mongoose.model("Reply", replySchema);
